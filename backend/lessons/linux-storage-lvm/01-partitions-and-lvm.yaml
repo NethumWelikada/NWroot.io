@@ -1,0 +1,38 @@
+title: "Linux Admin: Disk Partitions and LVM Basics"
+description: >
+  Learn the concepts behind partitioning and Logical Volume
+  Management (LVM) - one of the more advanced certification topics.
+difficulty: advanced
+estimated_minutes: 30
+exam_relevance: >
+  Direct certification objective: "List, create, and delete partitions
+  on MBR and GPT disks" and "Configure LVM storage."
+tasks:
+  - id: 1
+    instruction: "List all block devices attached to the system."
+    hint: "lsblk"
+    validation_command: "lsblk"
+    expected_output_contains: "NAME"
+  - id: 2
+    instruction: "View detailed partition information using fdisk in list-only mode."
+    hint: "sudo fdisk -l"
+    validation_command: "sudo fdisk -l"
+    expected_output_contains: "Disk"
+  - id: 3
+    instruction: "Check current LVM physical volumes on the system (a fresh sandbox may show no output here - that's expected, since no LVM volumes have been created yet)."
+    hint: "sudo pvs"
+    validation_command: "sudo pvs"
+    expected_output_contains: ""
+  - id: 4
+    instruction: "Check current LVM volume groups."
+    hint: "sudo vgs"
+    validation_command: "sudo vgs"
+    expected_output_contains: ""
+notes: >
+  Exam tip: This lesson covers the READ/INSPECT commands (lsblk,
+  fdisk -l, pvs, vgs, lvs). Because creating real partitions
+  requires an attached extra disk device, full create/extend LVM
+  practice requires a sandbox with an extra virtual disk attached
+  - this is planned for a future NWroot.io update. For now, get
+  fluent in reading existing storage layouts, which is itself
+  tested throughout professional Linux certification exams.

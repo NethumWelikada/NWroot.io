@@ -1,0 +1,30 @@
+{
+  "name": "nwroot-frontend",
+  "version": "0.1.0",
+  "private": true,
+  "description": "NWroot.io - Sudo won't fix ignorance.",
+  "author": "Nethum Welikada <https://github.com/NethumWelikada>",
+  "license": "MIT",
+  "homepage": "https://nwroot.io",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build:staging": "vite build --mode staging",
+    "build:production": "vite build --mode production",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "axios": "^1.7.4",
+    "lucide-react": "^1.25.0",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "react-router-dom": "^6.26.0",
+    "xterm": "^5.3.0",
+    "xterm-addon-fit": "^0.8.0"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-react": "^4.3.1",
+    "terser": "^5.31.6",
+    "vite": "^5.4.0"
+  }
+}

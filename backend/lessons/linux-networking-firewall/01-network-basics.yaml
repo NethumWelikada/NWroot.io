@@ -1,0 +1,33 @@
+title: "Linux Admin: Network Configuration Basics"
+description: >
+  Inspect and understand network interfaces, IP addressing, and
+  basic connectivity troubleshooting.
+difficulty: intermediate
+estimated_minutes: 20
+exam_relevance: >
+  Direct certification objective: "Configure IPv4 and IPv6 addresses" and
+  general network troubleshooting throughout the exam.
+tasks:
+  - id: 1
+    instruction: "List all network interfaces and their IP addresses."
+    hint: "ip addr"
+    validation_command: "ip addr"
+    expected_output_contains: "inet"
+  - id: 2
+    instruction: "Test connectivity by pinging a well-known address 4 times."
+    hint: "ping -c 4 8.8.8.8"
+    validation_command: "ping -c 4 8.8.8.8"
+    expected_output_contains: "bytes from"
+  - id: 3
+    instruction: "Check which ports are currently listening on the system."
+    hint: "sudo ss -tulnp"
+    validation_command: "sudo ss -tulnp"
+    expected_output_contains: "LISTEN"
+  - id: 4
+    instruction: "Look up the IP address of a domain name using dig or nslookup."
+    hint: "dig google.com"
+    validation_command: "dig google.com"
+    expected_output_contains: "ANSWER"
+notes: >
+  Exam tip: 'ip' is the modern replacement for the older ifconfig
+  command - Certification exams expect 'ip' command fluency, not ifconfig.

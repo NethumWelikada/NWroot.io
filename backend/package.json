@@ -1,0 +1,25 @@
+{
+  "name": "nwroot-backend",
+  "version": "0.1.0",
+  "private": true,
+  "description": "NWroot.io backend - authentication, lessons, and Docker sandbox orchestration API",
+  "author": "Nethum Welikada <https://github.com/NethumWelikada>",
+  "license": "MIT",
+  "homepage": "https://nwroot.io",
+  "main": "src/main.js",
+  "scripts": {
+    "start": "node src/main.js",
+    "start:dev": "node --watch src/main.js"
+  },
+  "dependencies": {
+    "express": "^4.19.2",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "mysql2": "^3.11.0",
+    "bcryptjs": "^2.4.3",
+    "jsonwebtoken": "^9.0.2",
+    "ws": "^8.18.0",
+    "dockerode": "^4.0.2",
+    "js-yaml": "^4.1.0"
+  }
+}

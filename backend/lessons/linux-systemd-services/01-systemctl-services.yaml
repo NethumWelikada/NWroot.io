@@ -1,0 +1,34 @@
+title: "Linux Admin: Managing Services with systemctl"
+description: >
+  Start, stop, enable, disable, and check the status of system
+  services using systemd - a daily sysadmin task.
+difficulty: intermediate
+estimated_minutes: 20
+exam_relevance: >
+  Direct certification objective: "Start and stop services and configure
+  services to start automatically at boot."
+tasks:
+  - id: 1
+    instruction: "Check the current status of the Apache web server."
+    hint: "sudo systemctl status apache2"
+    validation_command: "sudo systemctl status apache2"
+    expected_output_contains: "apache2"
+  - id: 2
+    instruction: "Start the Apache service."
+    hint: "sudo systemctl start apache2"
+    validation_command: "sudo systemctl is-active apache2"
+    expected_output_contains: "active"
+  - id: 3
+    instruction: "Enable Apache so it starts automatically on every boot."
+    hint: "sudo systemctl enable apache2"
+    validation_command: "sudo systemctl is-enabled apache2"
+    expected_output_contains: "enabled"
+  - id: 4
+    instruction: "Stop the Apache service."
+    hint: "sudo systemctl stop apache2"
+    validation_command: "sudo systemctl is-active apache2"
+    expected_output_contains: "inactive"
+notes: >
+  Exam tip: "start" affects right now, "enable" affects what
+  happens on the NEXT boot. Certification-style tasks often require BOTH -
+  e.g. "start and enable" - and it's easy to only do one.

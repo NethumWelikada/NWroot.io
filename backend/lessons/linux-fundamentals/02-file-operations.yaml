@@ -1,0 +1,33 @@
+title: "File Operations: Create, Copy, Move, Delete"
+description: >
+  Master the everyday commands for managing files - creating,
+  copying, moving, renaming, and safely deleting.
+difficulty: beginner
+estimated_minutes: 15
+exam_relevance: >
+  Used constantly throughout certification-style tasks - file manipulation is
+  never tested in isolation, only as part of bigger tasks.
+tasks:
+  - id: 1
+    instruction: "Create an empty file called notes.txt in your home directory."
+    hint: "touch notes.txt"
+    validation_command: "test -f ~/notes.txt && echo exists"
+    expected_output_contains: "exists"
+  - id: 2
+    instruction: "Copy notes.txt to a new file called notes_backup.txt."
+    hint: "cp notes.txt notes_backup.txt"
+    validation_command: "test -f ~/notes_backup.txt && echo exists"
+    expected_output_contains: "exists"
+  - id: 3
+    instruction: "Rename notes_backup.txt to archive.txt (hint: mv does both move AND rename)."
+    hint: "mv notes_backup.txt archive.txt"
+    validation_command: "test -f ~/archive.txt && echo exists"
+    expected_output_contains: "exists"
+  - id: 4
+    instruction: "Delete the archive.txt file."
+    hint: "rm archive.txt"
+    validation_command: "test ! -f ~/archive.txt && echo deleted"
+    expected_output_contains: "deleted"
+notes: >
+  Exam tip: rm has no recycle bin. Always double check your target
+  file/path before running it, especially with wildcards.

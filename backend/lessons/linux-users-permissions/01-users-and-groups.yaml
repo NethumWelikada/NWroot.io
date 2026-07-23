@@ -1,0 +1,35 @@
+title: "Linux Admin: Managing Users and Groups"
+description: >
+  Create and manage local user accounts and groups - a core
+  professional Linux certification exam objective.
+difficulty: intermediate
+estimated_minutes: 20
+exam_relevance: >
+  Direct certification objective: "Create, delete, and modify local
+  user accounts" and "Create, delete, and modify local groups
+  and group memberships."
+tasks:
+  - id: 1
+    instruction: "Create a new user called 'devops1' using useradd (you'll need sudo)."
+    hint: "sudo useradd devops1"
+    validation_command: "id devops1"
+    expected_output_contains: "devops1"
+  - id: 2
+    instruction: "Set a password for devops1 using passwd."
+    hint: "sudo passwd devops1"
+    validation_command: "sudo passwd -S devops1"
+    expected_output_contains: "devops1"
+  - id: 3
+    instruction: "Create a new group called 'sysadmins'."
+    hint: "sudo groupadd sysadmins"
+    validation_command: "getent group sysadmins"
+    expected_output_contains: "sysadmins"
+  - id: 4
+    instruction: "Add devops1 to the sysadmins group as a secondary member."
+    hint: "sudo usermod -aG sysadmins devops1"
+    validation_command: "groups devops1"
+    expected_output_contains: "sysadmins"
+notes: >
+  Exam tip: -aG (append + supplementary Group) is critical.
+  Forgetting -a with usermod -G REPLACES all existing groups
+  instead of adding to them - a very common certification exam mistake.

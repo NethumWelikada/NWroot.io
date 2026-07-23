@@ -1,0 +1,33 @@
+title: "Docker: Container Fundamentals"
+description: >
+  Learn basic Docker commands - pulling images, running
+  containers, and managing their lifecycle.
+difficulty: intermediate
+estimated_minutes: 20
+exam_relevance: >
+  Not a foundational certification topic (that's covered in more advanced professional
+  certifications), but essential, widely-required DevOps skill.
+tasks:
+  - id: 1
+    instruction: "Check the installed Docker version."
+    hint: "docker --version"
+    validation_command: "docker --version"
+    expected_output_contains: "Docker version"
+  - id: 2
+    instruction: "Pull the official 'hello-world' image from Docker Hub."
+    hint: "docker pull hello-world"
+    validation_command: "docker images"
+    expected_output_contains: "hello-world"
+  - id: 3
+    instruction: "Run the hello-world container."
+    hint: "docker run hello-world"
+    validation_command: "docker ps -a"
+    expected_output_contains: "hello-world"
+  - id: 4
+    instruction: "List all containers, including stopped ones."
+    hint: "docker ps -a"
+    validation_command: "docker ps -a"
+    expected_output_contains: "CONTAINER ID"
+notes: >
+  Exam tip: 'docker ps' only shows RUNNING containers by default -
+  always add -a to see stopped ones too, a very common early mistake.

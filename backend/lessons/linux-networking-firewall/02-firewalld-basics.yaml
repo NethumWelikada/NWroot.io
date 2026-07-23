@@ -1,0 +1,37 @@
+title: "Linux Admin: Firewall Basics with ufw"
+description: >
+  Learn firewall concepts using ufw (Uncomplicated Firewall).
+  Note: Some certification tracks use firewalld (distribution-specific) - this lesson
+  teaches the underlying concepts, which transfer directly.
+difficulty: intermediate
+estimated_minutes: 15
+exam_relevance: >
+  Direct certification objective: "Configure firewall settings using
+  firewall-cmd/firewalld." Concepts here (allow/deny by port and
+  service) map directly - only command syntax differs on other distributions.
+tasks:
+  - id: 1
+    instruction: "Check the current firewall status."
+    hint: "sudo ufw status"
+    validation_command: "sudo ufw status"
+    expected_output_contains: "Status"
+  - id: 2
+    instruction: "Allow incoming traffic on port 80 (HTTP)."
+    hint: "sudo ufw allow 80/tcp"
+    validation_command: "sudo ufw status"
+    expected_output_contains: "80"
+  - id: 3
+    instruction: "Allow incoming SSH traffic (port 22)."
+    hint: "sudo ufw allow 22/tcp"
+    validation_command: "sudo ufw status"
+    expected_output_contains: "22"
+  - id: 4
+    instruction: "Enable the firewall."
+    hint: "sudo ufw enable"
+    validation_command: "sudo ufw status"
+    expected_output_contains: "active"
+notes: >
+  Exam tip: the equivalent commands are
+  'firewall-cmd --add-port=80/tcp --permanent' followed by
+  'firewall-cmd --reload'. The CONCEPT (open specific ports/
+  services, not everything) is what's actually being tested.

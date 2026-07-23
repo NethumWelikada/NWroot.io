@@ -1,0 +1,33 @@
+title: "Linux Admin: File Permissions and Ownership"
+description: >
+  Understand and modify the read/write/execute permission model,
+  and change file ownership - essential daily sysadmin skill.
+difficulty: intermediate
+estimated_minutes: 20
+exam_relevance: >
+  Direct certification objective: "Configure file permissions, ownership,
+  and SELinux context to control access to files."
+tasks:
+  - id: 1
+    instruction: "Create a file called secret.txt and check its current permissions with ls -l."
+    hint: "touch secret.txt && ls -l secret.txt"
+    validation_command: "ls -l ~/secret.txt"
+    expected_output_contains: "secret.txt"
+  - id: 2
+    instruction: "Change secret.txt permissions so only the owner can read and write (600)."
+    hint: "chmod 600 secret.txt"
+    validation_command: "stat -c '%a' ~/secret.txt"
+    expected_output_contains: "600"
+  - id: 3
+    instruction: "Change the group ownership of secret.txt to the sysadmins group (create it first if needed)."
+    hint: "sudo chgrp sysadmins secret.txt"
+    validation_command: "ls -l ~/secret.txt"
+    expected_output_contains: "sysadmins"
+  - id: 4
+    instruction: "Make a script file executable using chmod +x."
+    hint: "touch script.sh && chmod +x script.sh"
+    validation_command: "test -x ~/script.sh && echo executable"
+    expected_output_contains: "executable"
+notes: >
+  Exam tip: Know both numeric (chmod 750) and symbolic (chmod u+x)
+  permission notation - Certification-style tasks phrase requirements both ways.

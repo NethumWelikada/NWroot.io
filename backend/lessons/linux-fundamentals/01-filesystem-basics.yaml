@@ -1,0 +1,38 @@
+# ============================================================
+# Lesson: Filesystem Basics
+# Track: Linux Fundamentals
+# ============================================================
+title: "Filesystem Basics: Navigating Linux"
+description: >
+  Learn the core commands every Linux user needs to move around
+  the filesystem, list contents, and understand where you are.
+difficulty: beginner
+estimated_minutes: 15
+exam_relevance: >
+  Foundational for professional Linux certification - filesystem navigation appears
+  implicitly in nearly every exam task.
+tasks:
+  - id: 1
+    instruction: "Print your current working directory using pwd."
+    hint: "pwd"
+    validation_command: "pwd"
+    expected_output_contains: "/home/student"
+  - id: 2
+    instruction: "List all files in your home directory, including hidden ones."
+    hint: "ls -la ~"
+    validation_command: "ls -la ~"
+    expected_output_contains: "."
+  - id: 3
+    instruction: "Create a new directory called 'practice' inside your home folder."
+    hint: "mkdir practice"
+    validation_command: "test -d ~/practice && echo exists"
+    expected_output_contains: "exists"
+  - id: 4
+    instruction: "Move into the 'practice' directory you just created."
+    hint: "cd practice"
+    validation_command: "pwd"
+    expected_output_contains: "practice"
+notes: >
+  Exam tip: Certification-style tasks are almost always given as a working
+  directory + a goal. Get comfortable moving around fast with
+  pwd, ls, and cd before anything else.
