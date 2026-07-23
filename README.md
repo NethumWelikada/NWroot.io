@@ -328,6 +328,7 @@ SANDBOX_IMAGE_NAME=nwroot-sandbox
 SANDBOX_IDLE_TIMEOUT_MINUTES=30
 SANDBOX_CPU_LIMIT=1
 SANDBOX_MEMORY_LIMIT_MB=1024
+#SANDBOX_RUNTIME=runsc
 ```
 
 The frontend uses **separate** env files per build mode (`frontend/.env.staging`, `frontend/.env.production`), since Vite bakes these values into the build at compile time.
@@ -375,18 +376,80 @@ Task `id` values must be sequential integers starting at 1 within each lesson - 
 - [x] Phase 1 - Auth (with name collection), real sandbox sessions, working `systemctl` via shim, content tracks across Linux fundamentals, users/permissions, storage, systemd, networking, Apache, MySQL, and Docker
 - [x] Phase 2 - Per-task completion, XP/levels, Profile page, search + category filters
 - [x] Phase 3 - Live automatic task validation - clicking a task checkbox actually runs its validation command inside the user's real sandbox container and only awards completion/XP if the real output matches
-- [ ] Phase 4 - Scaled orchestration (Docker Swarm/Kubernetes), stronger sandbox isolation (gVisor/Firecracker)
-- [ ] Phase 5 - CI/CD pipeline labs (Jenkins/GitHub Actions)
-- [ ] Phase 6 - Infrastructure as Code labs (Ansible/Terraform)
+- [x] Phase 4 (partial) - Optional gVisor sandbox isolation, configurable via `SANDBOX_RUNTIME` in `.env` (see "Sandbox Isolation" section above). Scaled orchestration (Docker Swarm/Kubernetes) intentionally deferred until real concurrent user load justifies the added operational complexity
+- [x] Phase 5 (partial) - GitHub Actions labs (writing/validating real workflow YAML, git commits) - 2 lessons live. Jenkins labs still to come
+- [x] Phase 6 - Infrastructure as Code labs: Ansible (real playbooks run against localhost) and Terraform (local provider, no cloud cost/credentials needed) - 2 lessons live
 - [ ] Phase 7 - Kubernetes labs (k3s/minikube)
 - [ ] Phase 8 - LVM create/extend labs (requires attaching an extra virtual disk per sandbox)
+
+---
+
+## Sandbox Isolation (gVisor) - Optional but Recommended Before Going Public
+
+By default, sandbox containers run on standard Docker (`runc`), which isn't a complete security boundary - every signed-up user gets real root/sudo access inside their container. [gVisor](https://gvisor.dev) adds a userspace kernel layer between containers and the real host kernel, intercepting syscalls and blocking most known container-escape techniques. This is **off by default** and safe to skip while you're the only user - but worth enabling before this is exposed to the public internet.
+
+### Install gVisor on Ubuntu
+
+```bash
+curl -fsSL https://gvisor.dev/archive.key | sudo gpg --dearmor -o /usr/share/keyrings/gvisor-archive-keyring.gpg
+echo "deb [signed-by=/usr/share/keyrings/gvisor-archive-keyring.gpg] https://storage.googleapis.com/gvisor/releases release main" | sudo tee /etc/apt/sources.list.d/gvisor.list > /dev/null
+sudo apt-get update
+sudo apt-get install -y runsc
+```
+
+### Register it as a Docker runtime
+
+Edit (or create) `/etc/docker/daemon.json`:
+```json
+{
+  "runtimes": {
+    "runsc": {
+      "path": "/usr/bin/runsc"
+    }
+  }
+}
+```
+
+Then restart Docker:
+```bash
+sudo systemctl restart docker
+```
+
+### Verify it's registered
+
+```bash
+docker info | grep -i runtime
+```
+You should see `runsc` listed among the available runtimes.
+
+### Test it works before relying on it
+
+```bash
+docker run --rm --runtime=runsc nwroot-sandbox echo "gVisor works"
+```
+
+### Enable it for NWroot.io sandboxes
+
+Uncomment this line in `backend/.env`:
+```env
+SANDBOX_RUNTIME=runsc
+```
+
+Then restart the backend:
+```bash
+pm2 restart nwroot-backend
+```
+
+**Only NEW sandbox containers pick up the change** - existing running containers created before this point are unaffected until the user resets their sandbox.
+
+**Known tradeoff:** gVisor adds a small performance/compatibility overhead since it intercepts syscalls in userspace - some workloads run slightly slower, and very unusual syscalls can occasionally behave differently than under real Linux. For a beginner-focused sandbox (bash, apt, systemctl-shim, apache2, mysql, basic networking), this is a good tradeoff; test your specific lesson set against it before fully committing.
 
 ---
 
 ## Security Notes for Anyone Deploying This
 
 - Change `DB_PASSWORD` and `JWT_SECRET` in `backend/.env` before production use
-- Sandbox containers are resource-limited (CPU/RAM via `backend/.env`) but **plain Docker is not a perfect security boundary** - for a public-facing product at real scale, consider gVisor or Firecracker for stronger isolation
+- Sandbox containers are resource-limited (CPU/RAM via `backend/.env`) but **plain Docker is not a perfect security boundary** - see the "Sandbox Isolation (gVisor)" section above for an optional hardening step recommended before public deployment
 - `systemctl` inside sandboxes is intentionally a lightweight shim, not real systemd - this was a deliberate choice to avoid running sandboxes in `--privileged` mode, which would be a larger security tradeoff on plain Docker isolation. See `backend/docker/sandbox-image/systemctl-shim.sh` for details
 - The idle session cleanup job (every 5 minutes) helps control both cost and abuse - don't disable it in production
 - This project is not a substitute for a professional security review before handling real public traffic

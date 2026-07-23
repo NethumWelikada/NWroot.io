@@ -1,0 +1,39 @@
+title: "Terraform: Local Provider Basics"
+description: >
+  Write real Terraform configuration and run the actual
+  init/plan/apply workflow - using Terraform's local provider,
+  so no cloud account, credentials, or cost is involved.
+difficulty: intermediate
+estimated_minutes: 20
+exam_relevance: >
+  Terraform is one of the most widely required Infrastructure as
+  Code tools in DevOps and Solution Architect roles, valued for
+  managing infrastructure across many different cloud providers
+  with one consistent workflow.
+tasks:
+  - id: 1
+    instruction: "Create a project folder for this lesson and write a main.tf file that declares the local provider and creates a local_file resource containing some text."
+    hint: "mkdir -p terraform-lab && printf 'resource \"local_file\" \"example\" {\\n  content  = \"Managed by Terraform\\\\n\"\\n  filename = \"${path.module}/hello.txt\"\\n}\\n' > terraform-lab/main.tf"
+    validation_command: "test -f terraform-lab/main.tf && echo exists"
+    expected_output_contains: "exists"
+  - id: 2
+    instruction: "Initialize Terraform in that folder - this downloads the local provider plugin, the same first step every real Terraform project starts with."
+    hint: "cd terraform-lab && terraform init"
+    validation_command: "cd terraform-lab && terraform init"
+    expected_output_contains: "Terraform has been successfully initialized"
+  - id: 3
+    instruction: "Run terraform plan to preview what Terraform intends to create, without actually creating it yet."
+    hint: "cd terraform-lab && terraform plan"
+    validation_command: "cd terraform-lab && terraform plan"
+    expected_output_contains: "1 to add"
+  - id: 4
+    instruction: "Apply the plan for real and confirm the actual file was created with the expected content."
+    hint: "cd terraform-lab && terraform apply -auto-approve && cat hello.txt"
+    validation_command: "cd terraform-lab && terraform apply -auto-approve && cat hello.txt"
+    expected_output_contains: "Managed by Terraform"
+notes: >
+  Real-world Terraform almost always targets actual cloud providers
+  (AWS, Azure, GCP) instead of the local provider used here - but the
+  workflow you just practiced (write config, init, plan, apply) is
+  identical regardless of provider. The local provider lets you
+  learn that exact workflow for real, with zero cloud cost or risk.

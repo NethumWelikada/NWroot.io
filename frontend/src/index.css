@@ -49,6 +49,8 @@
   --cat-apache: #F87171;
   --cat-mysql: #60A5FA;
   --cat-docker: #38BDF8;
+  --cat-cicd: #A3E635;
+  --cat-iac: #C084FC;
 
   --font-sans: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   --font-mono: "Geist Mono", "Courier New", monospace; /* reserved for the terminal + inline code only */

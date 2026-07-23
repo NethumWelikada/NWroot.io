@@ -1,0 +1,40 @@
+title: "GitHub Actions: Triggers and Multiple Jobs"
+description: >
+  Go beyond a single-job workflow - configure multiple trigger
+  events and multiple jobs in one workflow file, and validate
+  the more complex YAML structure is still correct.
+difficulty: intermediate
+estimated_minutes: 20
+exam_relevance: >
+  Real-world CI/CD pipelines almost always have more than one
+  job (e.g. test, then build, then deploy) and trigger on more
+  than just a plain push - this is the natural next step after
+  a single-job workflow.
+tasks:
+  - id: 1
+    instruction: "Reuse your myproject folder from the previous lesson (create it fresh if needed) and create a new workflow file called multi.yml in .github/workflows."
+    hint: "mkdir -p ~/myproject/.github/workflows && touch ~/myproject/.github/workflows/multi.yml"
+    validation_command: "test -f ~/myproject/.github/workflows/multi.yml && echo exists"
+    expected_output_contains: "exists"
+  - id: 2
+    instruction: "Write a workflow into multi.yml that triggers on BOTH push and pull_request events, with two separate jobs named test and build."
+    hint: 'printf ''name: Multi Job CI\non:\n  push:\n  pull_request:\njobs:\n  test:\n    runs-on: ubuntu-latest\n    steps:\n      - run: echo "Running tests"\n  build:\n    runs-on: ubuntu-latest\n    steps:\n      - run: echo "Running build"\n'' > ~/myproject/.github/workflows/multi.yml'
+    validation_command: "test -f ~/myproject/.github/workflows/multi.yml && echo exists"
+    expected_output_contains: "exists"
+  - id: 3
+    instruction: "Validate the workflow is correct YAML, AND confirm it actually contains both the test and build jobs (a common real mistake is a typo that silently drops a job)."
+    hint: "python3 -c \"import yaml; d = yaml.safe_load(open('/home/student/myproject/.github/workflows/multi.yml')); assert 'test' in d['jobs'] and 'build' in d['jobs']; print('both jobs present')\""
+    validation_command: "python3 -c \"import yaml; d = yaml.safe_load(open('/home/student/myproject/.github/workflows/multi.yml')); assert 'test' in d['jobs'] and 'build' in d['jobs']; print('both jobs present')\""
+    expected_output_contains: "both jobs present"
+  - id: 4
+    instruction: "Commit the new workflow file to your existing git repository."
+    hint: "cd ~/myproject && git add . && git commit -m 'Add multi-job workflow with push and pull_request triggers'"
+    validation_command: "cd ~/myproject && git log --oneline"
+    expected_output_contains: "Add multi-job workflow"
+notes: >
+  Notice the "on:" section uses a mapping (push: / pull_request:) here
+  instead of the simple list style ([push]) from the previous lesson -
+  both are valid GitHub Actions syntax, but the mapping style is what
+  you need once you want to add conditions to a trigger (like only
+  running on specific branches), so it's worth being comfortable with
+  both forms.

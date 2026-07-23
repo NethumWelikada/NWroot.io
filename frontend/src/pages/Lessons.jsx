@@ -11,7 +11,7 @@
 import React, { useEffect, useState, useMemo } from "react";
 import { Link } from "react-router-dom";
 import {
-  Search, Terminal, Users, HardDrive, Power, Network, Globe, Database, Box,
+  Search, Terminal, Users, HardDrive, Power, Network, Globe, Database, Box, GitBranch, Blocks,
   CheckCircle2, Clock, LayoutGrid,
 } from "lucide-react";
 import apiClient from "../api/client";
@@ -29,6 +29,8 @@ const TRACK_META = {
   "apache-labs": { label: "Apache Labs", icon: Globe, color: "var(--cat-apache)" },
   "mysql-labs": { label: "MySQL Labs", icon: Database, color: "var(--cat-mysql)" },
   "docker-labs": { label: "Docker Labs", icon: Box, color: "var(--cat-docker)" },
+  "github-actions-labs": { label: "GitHub Actions", icon: GitBranch, color: "var(--cat-cicd)" },
+  "iac-labs": { label: "Infrastructure as Code", icon: Blocks, color: "var(--cat-iac)" },
 };
 
 export default function Lessons() {

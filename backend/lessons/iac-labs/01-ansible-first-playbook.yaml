@@ -1,0 +1,44 @@
+title: "Ansible: Writing and Running Your First Playbook"
+description: >
+  Write a real Ansible inventory and playbook, and actually run it
+  against your own sandbox using ansible-playbook - genuine
+  Infrastructure as Code, no external servers required.
+difficulty: intermediate
+estimated_minutes: 20
+exam_relevance: >
+  Ansible is one of the most commonly required Infrastructure as
+  Code tools in real DevOps job postings, valued for having no
+  agent to install on managed hosts.
+tasks:
+  - id: 1
+    instruction: "Create an Ansible inventory file that tells Ansible to manage your own local machine directly, without SSH."
+    hint: "echo 'localhost ansible_connection=local' > inventory.ini"
+    validation_command: "test -f inventory.ini && echo exists"
+    expected_output_contains: "exists"
+  - id: 2
+    instruction: "Write a playbook.yml with one play targeting localhost that writes specific text content into testfile.txt using the ansible.builtin.copy module."
+    hint: "printf -- '- name: Test playbook\\n  hosts: localhost\\n  tasks:\\n    - name: Create a test file with specific content\\n      ansible.builtin.copy:\\n        content: \"Managed by Ansible\\\\n\"\\n        dest: testfile.txt\\n' > playbook.yml"
+    validation_command: "test -f playbook.yml && echo exists"
+    expected_output_contains: "exists"
+  - id: 3
+    instruction: "Run the playbook for real against your inventory, and confirm the task actually executed and created the file with the right content."
+    hint: "ansible-playbook -i inventory.ini playbook.yml && cat testfile.txt"
+    validation_command: "ansible-playbook -i inventory.ini playbook.yml && cat testfile.txt"
+    expected_output_contains: "Managed by Ansible"
+  - id: 4
+    instruction: "Run the exact same playbook a second time and notice Ansible reports changed=0 this time - it detects the content already matches and correctly does nothing, instead of blindly re-running the action."
+    hint: "ansible-playbook -i inventory.ini playbook.yml"
+    validation_command: "ansible-playbook -i inventory.ini playbook.yml"
+    expected_output_contains: "changed=0"
+notes: >
+  Task 4's expected output "changed=0" is the actual proof of
+  idempotence - the file's content already matches what the
+  playbook specifies, so Ansible correctly reports no change
+  needed the second time. This is the core value proposition of
+  tools like Ansible over plain shell scripts. Note: an earlier
+  version of this lesson used "state: touch", which always updates
+  a file's timestamp and is NOT actually idempotent - copy with
+  content comparison is the genuinely correct way to demonstrate this.
+  All file paths in this lesson are relative (no ~ or leading /) so
+  they consistently land in your working directory regardless of
+  which user account is active.

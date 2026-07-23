@@ -28,22 +28,40 @@ async function createSandboxContainer(userId) {
   const cpuLimit = parseFloat(process.env.SANDBOX_CPU_LIMIT || "1");
   const memoryLimitMb = parseInt(process.env.SANDBOX_MEMORY_LIMIT_MB || "1024", 10);
 
-  logger.info(`Creating sandbox container for user ${userId}...`);
+  // Phase 4 (partial): stronger sandbox isolation via gVisor. This is
+  // OPTIONAL and OFF by default - if SANDBOX_RUNTIME isn't set in .env,
+  // containers behave exactly as before (standard Docker/runc). Once
+  // gVisor is installed on the host and SANDBOX_RUNTIME=runsc is set,
+  // every NEW sandbox container gets an extra userspace kernel layer
+  // between it and the real host kernel, blocking most known
+  // container-escape techniques. Existing running containers are
+  // unaffected until they're next reset/recreated.
+  const sandboxRuntime = process.env.SANDBOX_RUNTIME || null;
+
+  logger.info(`Creating sandbox container for user ${userId}${sandboxRuntime ? ` (runtime: ${sandboxRuntime})` : ""}...`);
+
+  const hostConfig = {
+    // --- Resource limits: stop one user from overloading the server ---
+    Memory: memoryLimitMb * 1024 * 1024,     // convert MB to bytes
+    NanoCpus: cpuLimit * 1_000_000_000,      // Docker expects CPU limit in "nano CPUs"
+    // --- Network isolation: sandbox has NO route to the host's real
+    //     network or production systems, only its own internal network ---
+    NetworkMode: "bridge",
+    AutoRemove: false, // we remove it manually so we can log/cleanup first
+  };
+
+  // Only add the Runtime field if a non-default runtime is actually
+  // configured - omitting it entirely preserves normal Docker behavior
+  if (sandboxRuntime) {
+    hostConfig.Runtime = sandboxRuntime;
+  }
 
   const container = await docker.createContainer({
     Image: imageName,
     Tty: true,             // keeps the container's shell alive and interactive
     OpenStdin: true,       // allows us to send keystrokes into the container
     Cmd: ["/bin/bash"],    // the shell the user will actually be typing into
-    HostConfig: {
-      // --- Resource limits: stop one user from overloading the server ---
-      Memory: memoryLimitMb * 1024 * 1024,     // convert MB to bytes
-      NanoCpus: cpuLimit * 1_000_000_000,      // Docker expects CPU limit in "nano CPUs"
-      // --- Network isolation: sandbox has NO route to the host's real
-      //     network or production systems, only its own internal network ---
-      NetworkMode: "bridge",
-      AutoRemove: false, // we remove it manually so we can log/cleanup first
-    },
+    HostConfig: hostConfig,
     Labels: {
       "nwroot.userId": String(userId), // tag the container so we can find it later
     },

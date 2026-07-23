@@ -1,0 +1,37 @@
+title: "GitHub Actions: Writing Your First Workflow"
+description: >
+  Create a real GitHub Actions workflow file, validate its YAML
+  syntax, and commit it with git - the actual file-writing and
+  validation steps behind any CI/CD pipeline.
+difficulty: intermediate
+estimated_minutes: 20
+exam_relevance: >
+  Not a Linux certification topic, but one of the most commonly
+  required DevOps skills in real job postings and interviews.
+tasks:
+  - id: 1
+    instruction: "Create a project folder with the .github/workflows directory structure GitHub Actions expects."
+    hint: "mkdir -p ~/myproject/.github/workflows"
+    validation_command: "test -d ~/myproject/.github/workflows && echo exists"
+    expected_output_contains: "exists"
+  - id: 2
+    instruction: "Create a workflow file named ci.yml inside .github/workflows that runs on every push and prints Hello CI."
+    hint: 'printf ''name: CI\non: [push]\njobs:\n  build:\n    runs-on: ubuntu-latest\n    steps:\n      - run: echo "Hello CI"\n'' > ~/myproject/.github/workflows/ci.yml'
+    validation_command: "test -f ~/myproject/.github/workflows/ci.yml && echo exists"
+    expected_output_contains: "exists"
+  - id: 3
+    instruction: "Validate that your workflow file is actually syntactically correct YAML - a broken workflow file fails silently on GitHub with no useful local feedback, so checking it yourself first is a real habit worth building."
+    hint: "python3 -c \"import yaml; yaml.safe_load(open('/home/student/myproject/.github/workflows/ci.yml')); print('valid yaml')\""
+    validation_command: "python3 -c \"import yaml; yaml.safe_load(open('/home/student/myproject/.github/workflows/ci.yml')); print('valid yaml')\""
+    expected_output_contains: "valid yaml"
+  - id: 4
+    instruction: "Initialize a git repository in your project and commit the workflow file - this is the exact step that would trigger the real workflow once pushed to GitHub."
+    hint: "cd ~/myproject && git init && git add . && git commit -m 'Add CI workflow'"
+    validation_command: "cd ~/myproject && git log --oneline"
+    expected_output_contains: "Add CI workflow"
+notes: >
+  This workflow file won't actually RUN inside your sandbox - GitHub
+  Actions executes on GitHub's own servers once you push a repo there,
+  not locally. What you practiced here (writing correct YAML, validating
+  it, and committing it) is the real, testable part of the workflow -
+  the execution itself happens on GitHub after a real push.

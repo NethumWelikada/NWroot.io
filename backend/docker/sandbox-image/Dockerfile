@@ -30,9 +30,15 @@ ENV DEBIAN_FRONTEND=noninteractive
 # - net-tools, iproute2, iputils-ping, curl: for networking labs
 # - ufw: for basic firewall labs
 # - vim, nano: text editors
-# - docker.io: for Docker-in-Docker labs (advanced/optional)
 # - cron: for scheduling labs
 # - openssh-server: for SSH labs
+# - git: for version control and GitHub Actions labs
+# - python3-yaml: for validating workflow/config YAML syntax in
+#   GitHub Actions and Infrastructure as Code labs
+# - ansible: for Infrastructure as Code labs (runs playbooks
+#   against localhost, no external servers needed)
+# - terraform: for Infrastructure as Code labs (uses the local
+#   provider only - no real cloud credentials/cost involved)
 # ------------------------------------------------------------
 RUN apt-get update && apt-get install -y \
     apache2 \
@@ -49,8 +55,26 @@ RUN apt-get update && apt-get install -y \
     openssh-server \
     sudo \
     man-db \
+    git \
+    python3-yaml \
+    ansible \
+    gnupg \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
+
+# ------------------------------------------------------------
+# Install Terraform from HashiCorp's official apt repository.
+# NOTE: this exact install path could not be executed-tested in
+# the environment this Dockerfile was authored in (restricted
+# network egress that couldn't reach HashiCorp's servers) - these
+# are HashiCorp's own standard, widely-used install commands, but
+# verify this step completes successfully on your real server
+# before relying on the Infrastructure as Code lessons.
+# ------------------------------------------------------------
+RUN wget -O- https://apt.releases.hashicorp.com/gpg | gpg --dearmor -o /usr/share/keyrings/hashicorp-archive-keyring.gpg && \
+    echo "deb [signed-by=/usr/share/keyrings/hashicorp-archive-keyring.gpg] https://apt.releases.hashicorp.com jammy main" | tee /etc/apt/sources.list.d/hashicorp.list && \
+    apt-get update && apt-get install -y terraform && \
+    apt-get clean && rm -rf /var/lib/apt/lists/*
 
 # ------------------------------------------------------------
 # Install the systemctl shim, taking precedence over the real
@@ -71,6 +95,18 @@ RUN chmod +x /usr/local/bin/systemctl
 RUN useradd -m -s /bin/bash student && \
     echo "student:student" | chpasswd && \
     usermod -aG sudo student
+
+# Pre-configure git identity for BOTH root and the student user.
+# IMPORTANT: the interactive terminal session actually runs as root
+# (there's no USER directive in this Dockerfile, so Docker defaults
+# to root) - the "student@nwroot-sandbox" label in the terminal header
+# is just a cosmetic UI label, not the real shell user. Without this,
+# `git commit` fails with "Please tell me who you are" on a completely
+# fresh container, breaking the very first GitHub Actions lesson task
+# before the student even reaches the actual CI/CD content.
+RUN git config --global user.email "student@nwroot-sandbox" && \
+    git config --global user.name "Student" && \
+    su - student -c "git config --global user.email 'student@nwroot-sandbox' && git config --global user.name 'Student'"
 
 # Set a friendly working directory
 WORKDIR /home/student
