@@ -520,6 +520,6 @@ The MIT License requires that the original copyright notice and attribution be r
 
 ## Attribution
 
-**NWroot.io** was designed and developed by **Nethum Welikada**, Master of Engineering in Internetworking student at Dalhousie University, Halifax, Nova Scotia, Canada, as a project to make real, hands-on Linux and DevOps fundamentals accessible to beginners everywhere - starting in Sri Lanka, built for the world.
+**NWroot.io** was designed and developed by **Nethum Welikada**, Master of Engineering in Internetworking student at Dalhousie University, Halifax, Nova Scotia, Canada, as a project to make real, hands-on Linux and DevOps fundamentals accessible to beginners everywhere - starting in here, built for the world.
 
 If you fork, deploy, or build upon this project, please retain this attribution in the README, LICENSE, and application footer, in accordance with the MIT License terms.
