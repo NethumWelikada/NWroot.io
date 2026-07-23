@@ -1,0 +1,40 @@
+title: "Storage: Creating and Extending Logical Volumes"
+description: >
+  Go all the way through real LVM - create an actual logical
+  volume, format and mount it, then extend it and grow the
+  filesystem to match, all for real on a virtual disk.
+difficulty: advanced
+estimated_minutes: 25
+exam_relevance: >
+  Direct certification objective: "Configure LVM storage." This
+  completes the LVM workflow started in the previous lesson -
+  physical volume and volume group, then logical volume create
+  and extend, the exact sequence tested on real certification exams.
+tasks:
+  - id: 1
+    instruction: "Create a 200MB virtual disk, attach it as a loop device, and initialize it as an LVM physical volume."
+    hint: "dd if=/dev/zero of=disk.img bs=1M count=200 && sudo pvcreate $(sudo losetup -f --show disk.img)"
+    validation_command: "sudo pvs"
+    expected_output_contains: "loop"
+  - id: 2
+    instruction: "Create a volume group named practice_vg from that physical volume, then create a 100MB logical volume named practice_lv from it."
+    hint: "sudo vgcreate practice_vg $(sudo losetup -j disk.img | cut -d: -f1) && sudo lvcreate -L 100M -n practice_lv practice_vg"
+    validation_command: "sudo lvs"
+    expected_output_contains: "practice_lv"
+  - id: 3
+    instruction: "Format the logical volume with ext4 and mount it at /mnt/practice."
+    hint: "sudo mkfs.ext4 /dev/practice_vg/practice_lv && sudo mkdir -p /mnt/practice && sudo mount /dev/practice_vg/practice_lv /mnt/practice"
+    validation_command: "df -h /mnt/practice"
+    expected_output_contains: "/mnt/practice"
+  - id: 4
+    instruction: "Extend the logical volume by 50MB and grow the filesystem to match - the size check below confirms it actually grew, not just that the commands ran."
+    hint: "sudo lvextend -L +50M /dev/practice_vg/practice_lv && sudo resize2fs /dev/practice_vg/practice_lv"
+    validation_command: "SIZE_MB=$(sudo lvs --noheadings --units m --nosuffix -o lv_size practice_vg/practice_lv | tr -d ' '); python3 -c \"print('extended successfully' if float('$SIZE_MB') > 100 else 'not yet extended')\""
+    expected_output_contains: "extended successfully"
+notes: >
+  The size check in task 4 compares the ACTUAL current logical
+  volume size against 100MB rather than checking for one exact
+  expected number - LVM rounds extend requests to the nearest
+  physical extent boundary, so "+50M" doesn't always land on
+  exactly 150MB. Checking "is it bigger than before" is more
+  robust than checking for one specific rounded value.

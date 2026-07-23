@@ -1,0 +1,44 @@
+title: "Storage: Loop Devices, Physical Volumes, and Volume Groups"
+description: >
+  Create a real virtual disk from a plain file using a loop device,
+  then build the physical volume and volume group layers of LVM on
+  top of it - genuine LVM metadata operations, not a simulation.
+difficulty: advanced
+estimated_minutes: 25
+exam_relevance: >
+  Direct certification objective: "Configure LVM storage." This
+  lesson covers the physical volume and volume group layers for
+  real; logical volume creation depends on your server's kernel
+  configuration and may be added as a follow-up lesson once
+  confirmed working on your specific setup.
+tasks:
+  - id: 1
+    instruction: "Create a 200MB file to act as a virtual disk."
+    hint: "dd if=/dev/zero of=disk.img bs=1M count=200"
+    validation_command: "test -f disk.img && echo exists"
+    expected_output_contains: "exists"
+  - id: 2
+    instruction: "Attach that file as a real loop device so the kernel treats it like an actual disk."
+    hint: "sudo losetup -f --show disk.img"
+    validation_command: "sudo losetup -j disk.img"
+    expected_output_contains: "disk.img"
+  - id: 3
+    instruction: "Turn the loop device into an LVM physical volume - the first real layer of LVM, marking the disk as available for LVM to use."
+    hint: "sudo pvcreate $(sudo losetup -j disk.img | cut -d: -f1)"
+    validation_command: "sudo pvs"
+    expected_output_contains: "loop"
+  - id: 4
+    instruction: "Create a volume group named practice_vg from that physical volume - the layer that lets LVM pool one or more physical volumes together before carving out logical volumes."
+    hint: "sudo vgcreate practice_vg $(sudo losetup -j disk.img | cut -d: -f1)"
+    validation_command: "sudo vgs"
+    expected_output_contains: "practice_vg"
+notes: >
+  Logical volume creation (lvcreate) is the next real step after
+  this, but it depends on the host server's kernel having the
+  device-mapper module loaded - unlike pvcreate/vgcreate, which
+  only manipulate LVM metadata directly on the block device,
+  lvcreate needs to actually talk to the kernel's device-mapper
+  driver to create the usable /dev/mapper device. Check with
+  "lsmod | grep dm_mod" on the server hosting your sandbox - if
+  that's present, logical volume creation and extension can be
+  added as a follow-up lesson.

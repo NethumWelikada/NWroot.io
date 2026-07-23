@@ -1,7 +1,8 @@
-title: "Docker: Container Fundamentals"
+title: "Docker: Writing a Real Dockerfile"
 description: >
-  Learn basic Docker commands - pulling images, running
-  containers, and managing their lifecycle.
+  Write a real, correctly-structured Dockerfile and validate it
+  follows Docker's actual rules - the foundational skill behind
+  every containerized deployment.
 difficulty: intermediate
 estimated_minutes: 20
 exam_relevance: >
@@ -9,25 +10,32 @@ exam_relevance: >
   certifications), but essential, widely-required DevOps skill.
 tasks:
   - id: 1
-    instruction: "Check the installed Docker version."
-    hint: "docker --version"
-    validation_command: "docker --version"
-    expected_output_contains: "Docker version"
+    instruction: "Create a project folder for this Dockerfile."
+    hint: "mkdir -p myapp"
+    validation_command: "test -d myapp && echo exists"
+    expected_output_contains: "exists"
   - id: 2
-    instruction: "Pull the official 'hello-world' image from Docker Hub."
-    hint: "docker pull hello-world"
-    validation_command: "docker images"
-    expected_output_contains: "hello-world"
+    instruction: "Write a Dockerfile in that folder that starts from ubuntu:22.04, installs curl, and sets curl --version as the default command."
+    hint: "printf 'FROM ubuntu:22.04\\nRUN apt-get update && apt-get install -y curl\\nCMD [\"curl\", \"--version\"]\\n' > myapp/Dockerfile"
+    validation_command: "test -f myapp/Dockerfile && echo exists"
+    expected_output_contains: "exists"
   - id: 3
-    instruction: "Run the hello-world container."
-    hint: "docker run hello-world"
-    validation_command: "docker ps -a"
-    expected_output_contains: "hello-world"
+    instruction: "Confirm your Dockerfile follows Docker's actual required rule: FROM must be the first instruction in the file."
+    hint: "head -n 1 myapp/Dockerfile"
+    validation_command: "head -n 1 myapp/Dockerfile | grep -q '^FROM' && echo 'valid - starts with FROM'"
+    expected_output_contains: "valid - starts with FROM"
   - id: 4
-    instruction: "List all containers, including stopped ones."
-    hint: "docker ps -a"
-    validation_command: "docker ps -a"
-    expected_output_contains: "CONTAINER ID"
+    instruction: "Confirm the Dockerfile has all three instruction types a minimal working image needs: FROM, RUN, and CMD."
+    hint: "grep -q '^FROM' myapp/Dockerfile && grep -q '^RUN' myapp/Dockerfile && grep -q '^CMD' myapp/Dockerfile && echo 'all required instructions present'"
+    validation_command: "grep -q '^FROM' myapp/Dockerfile && grep -q '^RUN' myapp/Dockerfile && grep -q '^CMD' myapp/Dockerfile && echo 'all required instructions present'"
+    expected_output_contains: "all required instructions present"
 notes: >
-  Exam tip: 'docker ps' only shows RUNNING containers by default -
-  always add -a to see stopped ones too, a very common early mistake.
+  This sandbox doesn't run an actual Docker daemon inside your
+  container (that would need "Docker-in-Docker" with privileged
+  mode - a real security tradeoff this platform deliberately
+  avoids for every sandbox, the same reason systemctl here is a
+  shim rather than real systemd). What you practiced - writing a
+  correctly-structured Dockerfile and understanding its required
+  rules - is the exact same skill you'd use with a real Docker
+  installation; only the actual "docker build" step itself isn't
+  runnable here.

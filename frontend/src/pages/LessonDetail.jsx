@@ -113,10 +113,53 @@ export default function LessonDetail() {
     }
   }
 
+  // ------------------------------------------------------------
+  // Copies a command to the clipboard. navigator.clipboard.writeText()
+  // ONLY works in a "secure context" (HTTPS or localhost) - it silently
+  // does nothing on plain HTTP LAN addresses like this staging server,
+  // which is exactly why the button previously appeared broken. This
+  // falls back to the older execCommand('copy') approach (using a
+  // temporary hidden textarea) whenever the modern API isn't available,
+  // which works fine even over plain HTTP.
+  // ------------------------------------------------------------
   function handleCopyCommand(command, taskId) {
-    navigator.clipboard.writeText(command);
-    setCopiedTaskId(taskId);
-    setTimeout(() => setCopiedTaskId(null), 1500);
+    function showCopiedFeedback() {
+      setCopiedTaskId(taskId);
+      setTimeout(() => setCopiedTaskId(null), 1500);
+    }
+
+    if (navigator.clipboard && window.isSecureContext) {
+      navigator.clipboard.writeText(command).then(showCopiedFeedback).catch((err) => {
+        console.error("Clipboard write failed, falling back:", err);
+        copyViaFallback(command, showCopiedFeedback);
+      });
+    } else {
+      copyViaFallback(command, showCopiedFeedback);
+    }
+  }
+
+  function copyViaFallback(command, onSuccess) {
+    const textarea = document.createElement("textarea");
+    textarea.value = command;
+    // Keep it fully off-screen and non-interactive, but still a real
+    // focusable/selectable element - required for execCommand to work
+    textarea.style.position = "fixed";
+    textarea.style.left = "-9999px";
+    document.body.appendChild(textarea);
+    textarea.focus();
+    textarea.select();
+    try {
+      const succeeded = document.execCommand("copy");
+      if (succeeded) {
+        onSuccess();
+      } else {
+        console.error("execCommand('copy') returned false - copy may have failed.");
+      }
+    } catch (err) {
+      console.error("Fallback clipboard copy failed:", err);
+    } finally {
+      document.body.removeChild(textarea);
+    }
   }
 
   function handleRunCommand(command) {

@@ -56,6 +56,20 @@ async function createSandboxContainer(userId) {
     hostConfig.Runtime = sandboxRuntime;
   }
 
+  // Phase 8 (partial): real LVM create/extend labs need losetup
+  // (to create a virtual disk) AND working access to the kernel's
+  // device-mapper driver for lvcreate specifically. losetup alone
+  // does NOT need extra capabilities in most Docker setups, but
+  // lvcreate can. This is OFF by default (same pattern as
+  // SANDBOX_RUNTIME above) - only enable after confirming
+  // `lsmod | grep dm_mod` shows the module loaded on the HOST
+  // (see README's storage labs section for the full explanation
+  // of why this can't be fixed by a Docker capability alone if
+  // the host kernel itself doesn't have the module loaded).
+  if (process.env.SANDBOX_ENABLE_LVM === "true") {
+    hostConfig.CapAdd = ["SYS_ADMIN"];
+  }
+
   const container = await docker.createContainer({
     Image: imageName,
     Tty: true,             // keeps the container's shell alive and interactive

@@ -61,7 +61,7 @@ export default function Signup() {
           and try again - that's how the skill actually sticks.
         </p>
         <div className="auth-feature-list">
-          <div className="auth-feature-item"><span className="dot" />11 lessons across 7 tracks</div>
+          <div className="auth-feature-item"><span className="dot" />Most Important Lessons</div>
           <div className="auth-feature-item"><span className="dot" />Instant sandbox reset anytime</div>
           <div className="auth-feature-item"><span className="dot" />Built for complete beginners</div>
         </div>

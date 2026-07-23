@@ -39,6 +39,15 @@ ENV DEBIAN_FRONTEND=noninteractive
 #   against localhost, no external servers needed)
 # - terraform: for Infrastructure as Code labs (uses the local
 #   provider only - no real cloud credentials/cost involved)
+# - kubectl: for Kubernetes labs (manifests validated with
+#   "kubectl apply --dry-run=client" - no running cluster needed)
+# - lvm2: for storage/LVM labs (physical volume + volume group +
+#   logical volume layers, confirmed working end-to-end via a
+#   loop device - see SANDBOX_ENABLE_LVM in backend/.env)
+# - fdisk: for storage labs (fdisk -l disk inspection) - not
+#   included in the base Ubuntu image by default
+# - dnsutils: provides `dig`, for networking labs - also not
+#   included in the base Ubuntu image by default
 # ------------------------------------------------------------
 RUN apt-get update && apt-get install -y \
     apache2 \
@@ -59,8 +68,29 @@ RUN apt-get update && apt-get install -y \
     python3-yaml \
     ansible \
     gnupg \
+    lvm2 \
+    fdisk \
+    dnsutils \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
+
+# ------------------------------------------------------------
+# Install kubectl from Kubernetes' official apt repository.
+# NOTE: this exact install path could not be executed-tested in
+# the environment this Dockerfile was authored in (restricted
+# network egress that couldn't reach pkgs.k8s.io) - these are
+# Kubernetes' own standard, widely-used install commands, but
+# verify this step completes successfully on your real server
+# before relying on the Kubernetes lessons. kubectl alone (no
+# actual cluster) is sufficient for these lessons - manifests are
+# validated with "kubectl apply --dry-run=client", which never
+# contacts a real cluster.
+# ------------------------------------------------------------
+RUN mkdir -p /etc/apt/keyrings && \
+    curl -fsSL https://pkgs.k8s.io/core:/stable:/v1.29/deb/Release.key | gpg --dearmor -o /etc/apt/keyrings/kubernetes-apt-keyring.gpg && \
+    echo "deb [signed-by=/etc/apt/keyrings/kubernetes-apt-keyring.gpg] https://pkgs.k8s.io/core:/stable:/v1.29/deb/ /" | tee /etc/apt/sources.list.d/kubernetes.list && \
+    apt-get update && apt-get install -y kubectl && \
+    apt-get clean && rm -rf /var/lib/apt/lists/*
 
 # ------------------------------------------------------------
 # Install Terraform from HashiCorp's official apt repository.

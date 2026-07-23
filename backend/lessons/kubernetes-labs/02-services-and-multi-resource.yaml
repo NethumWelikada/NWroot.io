@@ -1,0 +1,37 @@
+title: "Kubernetes: Services and Multi-Resource Manifests"
+description: >
+  Combine a Deployment and a Service into a single multi-document
+  YAML file - the way real Kubernetes manifests are almost always
+  organized - and validate a file containing more than one object.
+difficulty: intermediate
+estimated_minutes: 20
+exam_relevance: >
+  Real Kubernetes projects almost never ship one object per file -
+  combining related resources (a Deployment and the Service that
+  exposes it) into one manifest is the normal, expected pattern.
+tasks:
+  - id: 1
+    instruction: "Reuse your k8s-lab folder from the previous lesson (create it fresh if needed) and create a new file called app.yaml."
+    hint: "mkdir -p k8s-lab && touch k8s-lab/app.yaml"
+    validation_command: "test -f k8s-lab/app.yaml && echo exists"
+    expected_output_contains: "exists"
+  - id: 2
+    instruction: "Write TWO YAML documents into app.yaml separated by a triple-dash line (---): a Deployment running nginx, and a Service that exposes it on port 80."
+    hint: "printf 'apiVersion: apps/v1\\nkind: Deployment\\nmetadata:\\n  name: nginx-deployment\\nspec:\\n  replicas: 2\\n  selector:\\n    matchLabels:\\n      app: nginx\\n  template:\\n    metadata:\\n      labels:\\n        app: nginx\\n    spec:\\n      containers:\\n        - name: nginx\\n          image: nginx:latest\\n---\\napiVersion: v1\\nkind: Service\\nmetadata:\\n  name: nginx-service\\nspec:\\n  selector:\\n    app: nginx\\n  ports:\\n    - port: 80\\n      targetPort: 80\\n' > k8s-lab/app.yaml"
+    validation_command: "test -f k8s-lab/app.yaml && echo exists"
+    expected_output_contains: "exists"
+  - id: 3
+    instruction: "Validate the file - since it contains TWO documents, a normal single-document YAML parser will actually fail here. Use a multi-document-aware check and confirm both a Deployment and a Service are present."
+    hint: "python3 -c \"import yaml; docs = list(yaml.safe_load_all(open('k8s-lab/app.yaml'))); kinds = [d['kind'] for d in docs]; assert 'Deployment' in kinds and 'Service' in kinds; print('both resources present:', kinds)\""
+    validation_command: "python3 -c \"import yaml; docs = list(yaml.safe_load_all(open('k8s-lab/app.yaml'))); kinds = [d['kind'] for d in docs]; assert 'Deployment' in kinds and 'Service' in kinds; print('both resources present:', kinds)\""
+    expected_output_contains: "both resources present"
+  - id: 4
+    instruction: "Validate the whole multi-resource file against Kubernetes' real object schema using kubectl's client-side dry run."
+    hint: "kubectl apply --dry-run=client -f k8s-lab/app.yaml"
+    validation_command: "kubectl apply --dry-run=client -f k8s-lab/app.yaml"
+    expected_output_contains: "created (dry run)"
+notes: >
+  A plain yaml.safe_load() call genuinely raises an error on a file
+  with more than one "---"-separated document - you must use
+  yaml.safe_load_all() (which returns a list of documents) whenever
+  you're validating a real-world multi-resource Kubernetes manifest.

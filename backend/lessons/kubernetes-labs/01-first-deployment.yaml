@@ -1,0 +1,38 @@
+title: "Kubernetes: Writing Your First Deployment Manifest"
+description: >
+  Write a real Kubernetes Deployment manifest and validate it two
+  ways - as plain YAML, and against Kubernetes' own object schema
+  using kubectl's client-side dry run (no running cluster needed).
+difficulty: intermediate
+estimated_minutes: 20
+exam_relevance: >
+  Writing correct Deployment manifests is one of the most common
+  daily tasks in any Kubernetes-related DevOps or Solution
+  Architect role.
+tasks:
+  - id: 1
+    instruction: "Create a folder for your Kubernetes manifests."
+    hint: "mkdir -p k8s-lab"
+    validation_command: "test -d k8s-lab && echo exists"
+    expected_output_contains: "exists"
+  - id: 2
+    instruction: "Write a Deployment manifest named deployment.yaml that runs 2 replicas of the nginx:latest image."
+    hint: "printf 'apiVersion: apps/v1\\nkind: Deployment\\nmetadata:\\n  name: nginx-deployment\\nspec:\\n  replicas: 2\\n  selector:\\n    matchLabels:\\n      app: nginx\\n  template:\\n    metadata:\\n      labels:\\n        app: nginx\\n    spec:\\n      containers:\\n        - name: nginx\\n          image: nginx:latest\\n' > k8s-lab/deployment.yaml"
+    validation_command: "test -f k8s-lab/deployment.yaml && echo exists"
+    expected_output_contains: "exists"
+  - id: 3
+    instruction: "Validate the manifest is syntactically correct YAML, and confirm it specifies exactly 2 replicas."
+    hint: "python3 -c \"import yaml; d = yaml.safe_load(open('k8s-lab/deployment.yaml')); assert d['spec']['replicas'] == 2; print('valid deployment with 2 replicas')\""
+    validation_command: "python3 -c \"import yaml; d = yaml.safe_load(open('k8s-lab/deployment.yaml')); assert d['spec']['replicas'] == 2; print('valid deployment with 2 replicas')\""
+    expected_output_contains: "valid deployment with 2 replicas"
+  - id: 4
+    instruction: "Validate the manifest against Kubernetes' actual object schema using kubectl's client-side dry run - this catches structural mistakes that plain YAML validation can't, like a missing required field, without needing a real cluster."
+    hint: "kubectl apply --dry-run=client -f k8s-lab/deployment.yaml"
+    validation_command: "kubectl apply --dry-run=client -f k8s-lab/deployment.yaml"
+    expected_output_contains: "created (dry run)"
+notes: >
+  "--dry-run=client" validates entirely using kubectl's local copy
+  of the Kubernetes API schema - it never contacts a real cluster,
+  so this works even though your sandbox has no Kubernetes cluster
+  running. This is genuinely how many teams catch manifest mistakes
+  before ever applying them for real.

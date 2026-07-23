@@ -11,7 +11,7 @@
 import React, { useEffect, useState, useMemo } from "react";
 import { Link } from "react-router-dom";
 import {
-  Search, Terminal, Users, HardDrive, Power, Network, Globe, Database, Box, GitBranch, Blocks,
+  Search, Terminal, Users, HardDrive, Power, Network, Globe, Database, Box, GitBranch, Blocks, Ship,
   CheckCircle2, Clock, LayoutGrid,
 } from "lucide-react";
 import apiClient from "../api/client";
@@ -31,6 +31,7 @@ const TRACK_META = {
   "docker-labs": { label: "Docker Labs", icon: Box, color: "var(--cat-docker)" },
   "github-actions-labs": { label: "GitHub Actions", icon: GitBranch, color: "var(--cat-cicd)" },
   "iac-labs": { label: "Infrastructure as Code", icon: Blocks, color: "var(--cat-iac)" },
+  "kubernetes-labs": { label: "Kubernetes", icon: Ship, color: "var(--cat-k8s)" },
 };
 
 export default function Lessons() {

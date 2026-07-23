@@ -379,8 +379,58 @@ Task `id` values must be sequential integers starting at 1 within each lesson - 
 - [x] Phase 4 (partial) - Optional gVisor sandbox isolation, configurable via `SANDBOX_RUNTIME` in `.env` (see "Sandbox Isolation" section above). Scaled orchestration (Docker Swarm/Kubernetes) intentionally deferred until real concurrent user load justifies the added operational complexity
 - [x] Phase 5 (partial) - GitHub Actions labs (writing/validating real workflow YAML, git commits) - 2 lessons live. Jenkins labs still to come
 - [x] Phase 6 - Infrastructure as Code labs: Ansible (real playbooks run against localhost) and Terraform (local provider, no cloud cost/credentials needed) - 2 lessons live
-- [ ] Phase 7 - Kubernetes labs (k3s/minikube)
-- [ ] Phase 8 - LVM create/extend labs (requires attaching an extra virtual disk per sandbox)
+- [x] Phase 7 - Kubernetes labs, YAML-only (no running cluster) - manifests validated with plain YAML parsing AND kubectl's client-side dry run, avoiding the privileged-container tradeoff a real k3s/minikube cluster would require. 2 lessons live
+- [x] Phase 8 - Full LVM workflow: loop device, physical volume, volume group, AND logical volume create/extend - all confirmed working end-to-end on a real server. 3 lessons live (see README storage labs section for notes on other deployments' kernels)
+
+---
+
+## Docker Labs - Dockerfile Authoring, Not a Running Daemon
+
+Sandbox containers don't run their own Docker daemon inside them - that would require "Docker-in-Docker" with `--privileged` mode, a meaningfully bigger security tradeoff than anything else in this project (bigger than gVisor's runtime swap, bigger than LVM's `SYS_ADMIN` capability - `--privileged` effectively disables most container security boundaries entirely). Consistent with every other security decision in this project, that tradeoff isn't taken.
+
+Instead, the Docker Labs track teaches real Dockerfile authoring and validates it against Docker's actual structural rules (e.g. `FROM` must be the first instruction) - genuinely testable without a daemon, same pattern as the GitHub Actions, Terraform, and Kubernetes tracks. The one thing that genuinely isn't possible in this sandbox is running `docker build`/`docker run` themselves.
+
+---
+
+## Storage Labs (LVM)
+
+The storage track has three lessons: read-only inspection (`lsblk`, `fdisk -l`, `pvs`, `vgs`), then loop device + physical volume + volume group creation, then full logical volume create-and-extend. All three are confirmed working end-to-end.
+
+**Logical volume creation (`lvcreate`) needs the host kernel's `device-mapper` driver.** This was confirmed working by actually running the full create-and-extend workflow on a real server - but since this project is meant to be cloned and deployed on other people's servers too, it's worth checking on any NEW deployment before assuming it'll work there as well, since this depends on the host kernel, not something a Docker capability alone can guarantee.
+
+### Check before enabling on a new deployment
+
+```bash
+sudo modprobe dm_mod
+ls -la /dev/mapper/
+```
+
+If `/dev/mapper/control` exists (it does on most modern Ubuntu kernels, even when `lsmod` shows nothing - device-mapper is very often built directly into the kernel rather than loaded as a separate module), logical volume creation is very likely to work. The definitive test is just trying it directly:
+
+```bash
+dd if=/dev/zero of=/tmp/test.img bs=1M count=100
+LOOPDEV=$(sudo losetup -f --show /tmp/test.img)
+sudo pvcreate "$LOOPDEV"
+sudo vgcreate test_vg "$LOOPDEV"
+sudo lvcreate -L 50M -n test_lv test_vg
+# Clean up:
+sudo vgremove -f test_vg && sudo pvremove "$LOOPDEV" && sudo losetup -d "$LOOPDEV" && rm /tmp/test.img
+```
+
+If `lvcreate` succeeds, you're good. If it fails with an error about the kernel driver, only the first two storage lessons (inspection, and physical volume/volume group) will work on that particular server.
+
+### Enabling it
+
+Uncomment in `backend/.env`:
+```env
+SANDBOX_ENABLE_LVM=true
+```
+Then restart the backend:
+```bash
+pm2 restart nwroot-backend
+```
+
+This grants sandbox containers the `SYS_ADMIN` capability - a real, meaningful increase from the current zero-extra-capabilities default, so only enable this after confirming it actually works on your host.
 
 ---
 
