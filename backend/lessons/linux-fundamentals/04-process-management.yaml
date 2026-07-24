@@ -1,0 +1,38 @@
+title: "Process Management: ps, kill, and Background Jobs"
+description: >
+  Start a real background process, inspect it while it's running,
+  and terminate it - the actual daily workflow of managing
+  processes on a Linux system.
+difficulty: intermediate
+estimated_minutes: 20
+exam_relevance: >
+  Foundational for professional Linux certification - identifying
+  and controlling running processes is tested directly and
+  appears in nearly every troubleshooting task.
+tasks:
+  - id: 1
+    instruction: "Start a 'sleep 300' process in the background and save its process ID to a file called sleep.pid."
+    hint: "sleep 300 & echo $! > sleep.pid"
+    validation_command: "test -f sleep.pid && echo exists"
+    expected_output_contains: "exists"
+  - id: 2
+    instruction: "Use ps to confirm that exact process is actually running, using the saved PID."
+    hint: "ps -p $(cat sleep.pid)"
+    validation_command: "ps -p $(cat sleep.pid)"
+    expected_output_contains: "sleep"
+  - id: 3
+    instruction: "List all processes on the system and find your sleep process in the full list."
+    hint: "ps aux | grep sleep | grep -v grep"
+    validation_command: "ps aux | grep sleep | grep -v grep"
+    expected_output_contains: "sleep 300"
+  - id: 4
+    instruction: "Terminate the process using kill and the saved PID, then confirm it's actually gone."
+    hint: "kill $(cat sleep.pid); sleep 1; ps -p $(cat sleep.pid) > /dev/null 2>&1 && echo still_running || echo terminated"
+    validation_command: "kill $(cat sleep.pid) 2>/dev/null; sleep 1; ps -p $(cat sleep.pid) > /dev/null 2>&1 && echo still_running || echo terminated"
+    expected_output_contains: "terminated"
+notes: >
+  Real processes don't remember shell variables between separate
+  terminal sessions - that's why this lesson saves the PID to a
+  file instead of just a shell variable. This mirrors how you'd
+  actually track a long-running process across multiple commands
+  or even multiple terminal windows in real work.

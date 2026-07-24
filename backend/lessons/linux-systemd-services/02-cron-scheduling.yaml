@@ -1,0 +1,37 @@
+title: "Scheduling Tasks with Cron"
+description: >
+  Start the cron service and schedule a real recurring task -
+  the standard way Linux systems automate anything that needs
+  to run on a schedule.
+difficulty: intermediate
+estimated_minutes: 20
+exam_relevance: >
+  Foundational for professional Linux certification - scheduling
+  recurring tasks (backups, log rotation, cleanup scripts) is a
+  daily sysadmin responsibility.
+tasks:
+  - id: 1
+    instruction: "Start the cron service."
+    hint: "sudo systemctl start cron"
+    validation_command: "sudo systemctl is-active cron"
+    expected_output_contains: "active"
+  - id: 2
+    instruction: "Add a cron job that appends 'hello' to /tmp/cron_test.log every 5 minutes."
+    hint: "(crontab -l 2>/dev/null; echo \"*/5 * * * * echo hello >> /tmp/cron_test.log\") | crontab -"
+    validation_command: "crontab -l"
+    expected_output_contains: "cron_test.log"
+  - id: 3
+    instruction: "List your current cron jobs to confirm the new one is scheduled correctly."
+    hint: "crontab -l"
+    validation_command: "crontab -l | grep cron_test"
+    expected_output_contains: "*/5 * * * *"
+  - id: 4
+    instruction: "Remove all of your cron jobs."
+    hint: "crontab -r"
+    validation_command: "crontab -l"
+    expected_output_contains: "no crontab"
+notes: >
+  The five time fields in a cron schedule are minute, hour, day
+  of month, month, and day of week, in that order. "*/5 * * * *"
+  means "every 5 minutes, every hour, every day" - the asterisks
+  mean "any value" and "*/5" means "every 5th value."

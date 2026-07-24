@@ -1,0 +1,38 @@
+title: "Bash Scripting: Variables, Loops, and Conditionals"
+description: >
+  Write and run real bash scripts using variables, a for loop
+  with arithmetic, and conditional logic - the building blocks
+  behind every automation script.
+difficulty: intermediate
+estimated_minutes: 25
+exam_relevance: >
+  Foundational for professional Linux certification and daily
+  DevOps work - shell scripting automates nearly everything else
+  in this platform's other lesson tracks.
+tasks:
+  - id: 1
+    instruction: "Write a script called myscript.sh that prints a greeting, then uses a for loop to sum the numbers 1, 2, and 3, and prints the result."
+    hint: "printf '#!/bin/bash\\necho \"Hello from a script\"\\nCOUNT=0\\nfor i in 1 2 3; do\\n  COUNT=$((COUNT + i))\\ndone\\necho \"Sum is $COUNT\"\\n' > myscript.sh"
+    validation_command: "test -f myscript.sh && echo exists"
+    expected_output_contains: "exists"
+  - id: 2
+    instruction: "Make the script executable and run it - the sum should be 6."
+    hint: "chmod +x myscript.sh && ./myscript.sh"
+    validation_command: "chmod +x myscript.sh && ./myscript.sh"
+    expected_output_contains: "Sum is 6"
+  - id: 3
+    instruction: "Write a second script called check.sh that uses an if/else statement to check whether myscript.sh exists, printing a different message for each case."
+    hint: "printf '#!/bin/bash\\nif [ -f myscript.sh ]; then\\n  echo \"File exists\"\\nelse\\n  echo \"File missing\"\\nfi\\n' > check.sh"
+    validation_command: "test -f check.sh && echo exists"
+    expected_output_contains: "exists"
+  - id: 4
+    instruction: "Make check.sh executable and run it - since myscript.sh exists from task 1, it should report that."
+    hint: "chmod +x check.sh && ./check.sh"
+    validation_command: "chmod +x check.sh && ./check.sh"
+    expected_output_contains: "File exists"
+notes: >
+  "$((...))" is bash's arithmetic expansion syntax - it's the
+  standard way to do integer math in a shell script, since bash
+  variables are otherwise treated as plain text. The [ -f file ]
+  test is one of dozens of built-in conditional tests bash
+  provides for checking files, strings, and numbers.

@@ -1,0 +1,38 @@
+title: "SSH: Starting the Service and Generating Keys"
+description: >
+  Start the real SSH service and generate a genuine SSH keypair -
+  the foundation of secure, passwordless remote access used
+  throughout the real world.
+difficulty: intermediate
+estimated_minutes: 20
+exam_relevance: >
+  Foundational for professional Linux certification - SSH key
+  management is a daily task for anyone administering remote
+  Linux servers.
+tasks:
+  - id: 1
+    instruction: "Start the SSH service."
+    hint: "sudo systemctl start ssh"
+    validation_command: "sudo systemctl is-active ssh"
+    expected_output_contains: "active"
+  - id: 2
+    instruction: "Generate a new ed25519 SSH keypair named mykey, with no passphrase."
+    hint: "ssh-keygen -t ed25519 -f mykey -N \"\""
+    validation_command: "test -f mykey && test -f mykey.pub && echo exists"
+    expected_output_contains: "exists"
+  - id: 3
+    instruction: "Display the public key's contents - this is the file you'd actually share or copy to a remote server, never the private key."
+    hint: "cat mykey.pub"
+    validation_command: "cat mykey.pub"
+    expected_output_contains: "ssh-ed25519"
+  - id: 4
+    instruction: "Check the key's fingerprint - a short, unique hash used to verify a key without comparing the entire (much longer) key text."
+    hint: "ssh-keygen -lf mykey.pub"
+    validation_command: "ssh-keygen -lf mykey.pub"
+    expected_output_contains: "SHA256"
+notes: >
+  The private key (mykey, no .pub extension) should NEVER leave
+  the machine it was generated on or be shared - only the .pub
+  file gets copied to servers you want to access. ed25519 is
+  the modern recommended key type, smaller and faster than
+  older RSA keys while being at least as secure.

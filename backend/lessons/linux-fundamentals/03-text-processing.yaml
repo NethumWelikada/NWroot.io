@@ -1,0 +1,37 @@
+title: "Text Processing: grep, sed, and awk"
+description: >
+  Search, transform, and extract data from text files using the
+  three tools every Linux user relies on daily - real file
+  editing, not just reading about the syntax.
+difficulty: intermediate
+estimated_minutes: 20
+exam_relevance: >
+  Foundational for professional Linux certification - text
+  processing appears constantly in real troubleshooting, log
+  analysis, and scripting tasks.
+tasks:
+  - id: 1
+    instruction: "Create a file called fruits.txt with three lines: 'apple 10', 'banana 20', 'cherry 30'."
+    hint: "printf 'apple 10\\nbanana 20\\ncherry 30\\n' > fruits.txt"
+    validation_command: "test -f fruits.txt && echo exists"
+    expected_output_contains: "exists"
+  - id: 2
+    instruction: "Use grep to find the line containing 'banana'."
+    hint: "grep banana fruits.txt"
+    validation_command: "grep banana fruits.txt"
+    expected_output_contains: "banana 20"
+  - id: 3
+    instruction: "Use sed to replace 'banana' with 'mango' directly in the file."
+    hint: "sed -i 's/banana/mango/' fruits.txt"
+    validation_command: "cat fruits.txt"
+    expected_output_contains: "mango"
+  - id: 4
+    instruction: "Use awk to print only the first column (the fruit names) from the file."
+    hint: "awk '{print $1}' fruits.txt"
+    validation_command: "awk '{print $1}' fruits.txt"
+    expected_output_contains: "apple"
+notes: >
+  These three tools have overlapping uses but different strengths:
+  grep finds lines, sed transforms text, awk works with columns of
+  structured data. Real troubleshooting often chains all three
+  together with pipes.

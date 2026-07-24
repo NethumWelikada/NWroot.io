@@ -48,6 +48,9 @@ ENV DEBIAN_FRONTEND=noninteractive
 #   included in the base Ubuntu image by default
 # - dnsutils: provides `dig`, for networking labs - also not
 #   included in the base Ubuntu image by default
+# NOTE: 'tree' is intentionally NOT pre-installed here - the
+# package management lesson installs it live as part of the
+# actual task, so pre-installing it would defeat the lesson.
 # ------------------------------------------------------------
 RUN apt-get update && apt-get install -y \
     apache2 \

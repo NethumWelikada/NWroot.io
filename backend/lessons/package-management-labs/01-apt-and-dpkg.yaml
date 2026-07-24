@@ -1,0 +1,39 @@
+title: "Package Management: apt and dpkg"
+description: >
+  Update package lists, install a real package, inspect it with
+  dpkg, and remove it - the standard workflow behind every
+  software installation on a Debian-based Linux system.
+difficulty: beginner
+estimated_minutes: 15
+exam_relevance: >
+  Foundational for professional Linux certification - installing,
+  querying, and removing packages correctly is a daily task on
+  any Debian or Ubuntu-based system.
+tasks:
+  - id: 1
+    instruction: "Update the local package list so apt knows about the latest available package versions."
+    hint: "sudo apt-get update"
+    validation_command: "sudo apt-get update"
+    expected_output_contains: "Reading package lists"
+  - id: 2
+    instruction: "Install the 'tree' package, a small utility that displays directory structures visually."
+    hint: "sudo apt-get install -y tree"
+    validation_command: "dpkg -l | grep tree"
+    expected_output_contains: "tree"
+  - id: 3
+    instruction: "Use dpkg to check the detailed installation status of the tree package."
+    hint: "dpkg -s tree"
+    validation_command: "dpkg -s tree"
+    expected_output_contains: "install ok installed"
+  - id: 4
+    instruction: "Remove the tree package and confirm it's no longer installed."
+    hint: "sudo apt-get remove -y tree"
+    validation_command: "dpkg -s tree 2>&1"
+    expected_output_contains: "not installed"
+notes: >
+  apt is the high-level tool most people use daily (handles
+  dependencies automatically), while dpkg works at a lower level
+  with individual .deb package files directly. Knowing both
+  matters - dpkg is what you reach for when apt itself needs
+  troubleshooting, or when installing a downloaded .deb file
+  that isn't in any apt repository.

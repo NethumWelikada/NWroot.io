@@ -1,0 +1,38 @@
+title: "Advanced Permissions: SUID, SGID, and the Sticky Bit"
+description: >
+  Set and recognize the three special permission bits that go
+  beyond basic read/write/execute - each with a genuinely
+  different real-world effect on how files and directories behave.
+difficulty: advanced
+estimated_minutes: 20
+exam_relevance: >
+  Direct certification objective: extends "Configure file
+  permissions, ownership, and SELinux context" - special
+  permission bits are a common advanced exam topic.
+tasks:
+  - id: 1
+    instruction: "Create a file called suidtest and set the SUID bit on it - this makes an executable run with the FILE OWNER's privileges, not the user running it."
+    hint: "touch suidtest && chmod u+s suidtest"
+    validation_command: "stat -c '%a' suidtest"
+    expected_output_contains: "4"
+  - id: 2
+    instruction: "Create a directory called sgiddir and set the SGID bit on it - new files created inside will inherit the DIRECTORY's group instead of the creating user's group."
+    hint: "mkdir sgiddir && chmod g+s sgiddir"
+    validation_command: "stat -c '%a' sgiddir"
+    expected_output_contains: "2"
+  - id: 3
+    instruction: "Create a directory called stickydir and set the sticky bit on it - inside a sticky directory, users can only delete their OWN files, even if the directory itself is writable by everyone (this is exactly how /tmp is configured)."
+    hint: "mkdir stickydir && chmod +t stickydir"
+    validation_command: "stat -c '%a' stickydir"
+    expected_output_contains: "1"
+  - id: 4
+    instruction: "View all three special permissions at once with ls -l, and notice how they display differently: SUID as 's' or 'S' in the owner's execute position, SGID the same in the group position, and sticky bit as 't' or 'T' in the others position."
+    hint: "ls -ld suidtest sgiddir stickydir"
+    validation_command: "ls -ld suidtest sgiddir stickydir"
+    expected_output_contains: "T"
+notes: >
+  The special bit shows as a CAPITAL letter (S or T) when the
+  underlying execute permission ISN'T also set - lowercase means
+  both the special bit AND execute are set together. In the numeric
+  form, the special bits are a leading 4th digit: 4=SUID, 2=SGID,
+  1=sticky - so "chmod 4755" sets SUID plus rwxr-xr-x.

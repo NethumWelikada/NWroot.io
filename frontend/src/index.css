@@ -52,6 +52,9 @@
   --cat-cicd: #A3E635;
   --cat-iac: #C084FC;
   --cat-k8s: #22D3EE;
+  --cat-shell: #FACC15;
+  --cat-ssh: #4ADE80;
+  --cat-pkg: #FB7185;
 
   --font-sans: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   --font-mono: "Geist Mono", "Courier New", monospace; /* reserved for the terminal + inline code only */

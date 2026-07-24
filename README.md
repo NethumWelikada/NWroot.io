@@ -468,6 +468,7 @@ Task `id` values must be sequential integers starting at 1 within each lesson - 
 - [x] Phase 6 - Infrastructure as Code labs: Ansible (real playbooks run against localhost) and Terraform (local provider, no cloud cost/credentials needed) - 2 lessons live
 - [x] Phase 7 - Kubernetes labs, YAML-only (no running cluster) - manifests validated with plain YAML parsing AND kubectl's client-side dry run, avoiding the privileged-container tradeoff a real k3s/minikube cluster would require. 2 lessons live
 - [x] Phase 8 - Full LVM workflow: loop device, physical volume, volume group, AND logical volume create/extend - all confirmed working end-to-end on a real server. 3 lessons live
+- [x] Curriculum expansion - Text processing (grep/sed/awk), process management, archiving, shell scripting, SSH, cron scheduling, package management, and advanced permissions (SUID/SGID/sticky bit) added across existing and new tracks. 27 total lessons across 14 tracks, all individually tested end-to-end against real command execution before shipping.
 
 ---
 

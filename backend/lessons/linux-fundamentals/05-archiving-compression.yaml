@@ -1,0 +1,39 @@
+title: "Archiving and Compression: tar and gzip"
+description: >
+  Create a real compressed archive, inspect its contents without
+  extracting, and extract it to a new location - the standard
+  workflow for packaging and distributing files on Linux.
+difficulty: beginner
+estimated_minutes: 15
+exam_relevance: >
+  Foundational for professional Linux certification - tar is the
+  standard tool for backups, distributing source code, and moving
+  files between systems.
+tasks:
+  - id: 1
+    instruction: "Create a folder called project containing two files: file1.txt (content 'hello') and file2.txt (content 'world')."
+    hint: "mkdir -p project && echo hello > project/file1.txt && echo world > project/file2.txt"
+    validation_command: "test -f project/file1.txt && test -f project/file2.txt && echo exists"
+    expected_output_contains: "exists"
+  - id: 2
+    instruction: "Create a compressed tar.gz archive of the project folder called project.tar.gz."
+    hint: "tar -czvf project.tar.gz project/"
+    validation_command: "test -f project.tar.gz && echo exists"
+    expected_output_contains: "exists"
+  - id: 3
+    instruction: "List the contents of the archive WITHOUT extracting it, to confirm both files are inside."
+    hint: "tar -tzvf project.tar.gz"
+    validation_command: "tar -tzvf project.tar.gz"
+    expected_output_contains: "file1.txt"
+  - id: 4
+    instruction: "Extract the archive into a new folder called extracted, and confirm the files are there."
+    hint: "mkdir -p extracted && tar -xzvf project.tar.gz -C extracted"
+    validation_command: "test -f extracted/project/file1.txt && test -f extracted/project/file2.txt && echo exists"
+    expected_output_contains: "exists"
+notes: >
+  "-czvf" breaks down as create, gzip-compress, verbose, filename -
+  and "-xzvf" for extraction swaps create for extract. Always
+  checking an archive's contents with -tzvf BEFORE extracting into
+  a real directory is a genuinely good habit, since it avoids
+  accidentally overwriting files if the archive doesn't have the
+  folder structure you expected.
